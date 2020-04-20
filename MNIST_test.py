@@ -107,13 +107,16 @@ classes = list(range(0,10))
 digits = datasets.load_digits()  
 X = digits['data']
 y = digits['target']
-#y_bin = label_binarize(y, classes)
-#print(y[1], y_bin[1])
+max_depth = 15
+depths = list(range(max_depth))[1:]
+print(depths)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
 
-
-
-# boost = Adaboost(learner = tree_model, n_classifiers = 30)
-# boost.fit(X_train, y_train)
-# boost.predict(X_test, y_test)
-# acc, error = boost.results(returnvals = True)
-# print(acc, error)
+for depth in depths:
+    boost = Adaboost(learner = DecisionTreeClassifier(max_depth = depth), n_classifiers = 100, learn_rate = .01)
+    boost.fit(X_train, y_train)
+    boost.predict(X_test, y_test)
+    acc, classifier_errors = boost.results()
+    print(f'Tree depth: {depth} : Accuracy: {acc:.4%}')
+    print('Classifier Errors:')
+    print(classifier_errors)

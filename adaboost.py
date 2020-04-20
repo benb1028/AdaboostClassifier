@@ -22,7 +22,7 @@ class Adaboost:
     relevent data for analysis and prediction.
     '''
     
-    def __init__(self, learner = stump, n_classifiers = 20, learn_rate = 1):
+    def __init__(self, learner, n_classifiers = 20, learn_rate = 1):
         '''Initialize the class with optional parameters.'''
         self.n_classifiers = n_classifiers
         self.classifiers = []
@@ -37,6 +37,7 @@ class Adaboost:
             print("Warning: invalid learning rate. Learn rate has been set to 1.")
             self.learn_rate = 1
         self.learn_rate = learn_rate
+
         
     def fit(self, X, y):
         '''Fit the model to a training sample.
@@ -92,7 +93,6 @@ class Adaboost:
         mistakes = y_pred != y
         
         classifier_error = np.mean(np.average(mistakes, weights = w, axis = 0))
-        
         if classifier_error <= 0:
             return w, 1., 0.
         
@@ -140,7 +140,7 @@ class Adaboost:
             print(f'Final Accuracy: {self.accuracy:3.3%}')
             print(f'Final Error Rate: {self.error_rate:3.3%}')
         if return_vals == True:
-            return self.accuracy, self.error_rate
+            return self.accuracy, self.classifier_errors
         
         
     def choose(self, X):
