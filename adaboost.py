@@ -204,7 +204,7 @@ def fix_train_error(error_list):
     return fixed_list
 
 def make_result_figure(dataset_name, X, y, learn_rate = 0.05, max_depth = 10, max_itr = 1800, n_classifiers = 100):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3)
     
     tree_base = DecisionTreeClassifier(max_depth = max_depth)
     logreg_base = LogisticRegression(max_iter = max_itr)
