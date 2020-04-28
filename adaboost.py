@@ -46,7 +46,7 @@ class Adaboost:
         '''Fit the model to a training sample.
         
         Stores the array of weak classifiers used for prediction,
-        as well as their weights and the sample weights.
+        as well as their weights, errors, and the sample weights.
         '''
         sample_n, n_variables = X.shape
         w = np.full(sample_n, (1./sample_n))
@@ -90,7 +90,7 @@ class Adaboost:
         self.classifiers.append(classifier)
         y_pred = classifier.predict(X)
         
-        if idx == 0: 
+        if idx == 0: # on first iteration, specify parameters
             self.classes = getattr(classifier, 'classes_', None)
             self.n_classes = len(self.classes)
         
@@ -116,21 +116,7 @@ class Adaboost:
         return w, alpha, classifier_error
             
     def predict(self, X, y = None):
-        '''Predict labels for a training samples. 
-
-        Parameters
-        ----------
-        X : array (n_test X n_variables)
-            Test input for the model
-        y : array, optional
-            Correct test output labels. When given, the model will automatically
-            check its predictions and store the results. The default is None.
-
-        Returns
-        -------
-        None.
-
-        '''
+        '''Predict labels for a training samples.'''
         pred = self.choose(X)
         self.predictions = self.classes.take(np.argmax(pred, axis = 1), axis = 0)
         if any(y) == True:
@@ -148,20 +134,7 @@ class Adaboost:
         
         
     def choose(self, X):
-        '''Make a prediction from the base classifier.
-        
-
-        Parameters
-        ----------
-        X : array (n_train X n_variables)
-            training sample
-
-        Returns
-        -------
-        pred : output label
-            The predicted value 
-
-        '''
+        '''Make a prediction from the base classifier.'''
         classes = self.classes[:, np.newaxis]
         pred = np.sum((classifier.predict(X) == classes).T * alpha
                    for classifier, alpha in zip(self.classifiers, self.alphas))
@@ -170,12 +143,14 @@ class Adaboost:
         
         
     def check(self, y):
+        '''Check predictions against actual labels and store results.'''
         self.accuracy = np.sum(np.where(self.predictions == y, 1, 0)) / len(self.predictions)
         self.error_rate = np.sum(np.where(self.predictions != y, 1, 0)) / len(self.predictions)
         
         
         
 def compare_learn_rates(X, y, learn_rates, num_cycles, max_depth):
+    '''Test various learning rates to find the ideal rate.'''
     acc_mat = np.zeros((num_cycles, len(learn_rates)))
     for cycle in range(num_cycles):
         print(f'Starting cycle {cycle}...')
@@ -200,29 +175,36 @@ def compare_learn_rates(X, y, learn_rates, num_cycles, max_depth):
     return avg_acc
 
 def fix_train_error(error_list):
+    '''In case where training error converges, force the remaining values to 0 for plotting.'''
     fixed_list = [err if err != 1 else 0 for err in error_list]
     return fixed_list
 
 def make_result_figure(dataset_name, X, y, learn_rate = 0.05, max_depth = 10, max_itr = 1800, n_classifiers = 100):
+    '''Generate figure comparing our implementation to the default, as well as comparing base estimators.'''
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3)
     
+    # base estimators
     tree_base = DecisionTreeClassifier(max_depth = max_depth)
     logreg_base = LogisticRegression(max_iter = max_itr)
     
+    # model 0 creation
     custom_tree_model = Adaboost(learner = tree_base, n_classifiers = n_classifiers, learn_rate = learn_rate).fit(X_train, y_train)
     custom_tree_model.predict(X_test, y_test)
     ctm_acc, ctm_train_error = custom_tree_model.results()
     ctm_train_error = fix_train_error(ctm_train_error)
     
+    # model 1 creation
     custom_logreg_model = Adaboost(learner = logreg_base, n_classifiers = n_classifiers, learn_rate = learn_rate).fit(X_train, y_train)
     custom_logreg_model.predict(X_test, y_test)
     clrm_acc, clrm_train_error = custom_logreg_model.results()
     clrm_train_error = fix_train_error(clrm_train_error)
     
+    # model 2 creation
     skl_tree_model = AdaBoostClassifier(tree_base, n_estimators = n_classifiers, learning_rate = learn_rate).fit(X_train, y_train)
     skltm_acc = skl_tree_model.score(X_test, y_test)
     skltm_train_error = fix_train_error(skl_tree_model.estimator_errors_)
     
+    # model 3 creation
     skl_logreg_model = AdaBoostClassifier(logreg_base, n_estimators = n_classifiers, learning_rate = learn_rate, algorithm = 'SAMME').fit(X_train, y_train)
     skllrm_acc = skl_logreg_model.score(X_test, y_test)
     skllrm_train_error = fix_train_error(skl_logreg_model.estimator_errors_)
@@ -240,9 +222,9 @@ def make_result_figure(dataset_name, X, y, learn_rate = 0.05, max_depth = 10, ma
     
     grid_size = (4, 6)
     fig = plt.figure(figsize=(18, 12))
-    ax1 = plt.subplot2grid(grid_size, (0,0), colspan = 3, rowspan = 3)
-    ax2 = plt.subplot2grid(grid_size, (0,3), colspan = 3, rowspan = 3)
-    ax3 = plt.subplot2grid(grid_size, (3,0), colspan = 6, rowspan = 1)
+    ax1 = plt.subplot2grid(grid_size, (0,0), colspan = 3, rowspan = 3) # training error subplot
+    ax2 = plt.subplot2grid(grid_size, (0,3), colspan = 3, rowspan = 3) # test accuracy subplot
+    ax3 = plt.subplot2grid(grid_size, (3,0), colspan = 6, rowspan = 1) # section for model details
     
     ax1.plot(classifiers, ctm_train_error, marker = 'o', markersize = 16, color = 'r', linewidth = 0.75, label = 'Model 0', alpha = 0.75)
     ax1.plot(classifiers, clrm_train_error, marker = '+', markersize = 16, color = 'r', linewidth = 0.75, label = 'Model 1')
