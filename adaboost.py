@@ -1,12 +1,19 @@
 # Authors: Ben Brooks and Ryan Marshall
-# Created for CS449 Assignment 3 at Clarkson University 
+# University: Clarkson University
+#
+# Created For: CS449 Assignment 3
+# Adapted For: CS449 Final Project
+# 
 # Adaboost Implementation
-
+#
+# Imported Common Libraries
 import numpy as np
+# Imported Machined Learning Classes
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
+# Imported Graphing Classes
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 
