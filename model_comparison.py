@@ -116,3 +116,6 @@ class Dataset():
         self.out_format = out_format
         self.samp_num = samp_num
         self.dim_format = dim_format
+        #Add # binary dimensions
+        #Add # categorical dimensions
+        #Add # output classes
