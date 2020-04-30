@@ -34,7 +34,8 @@ model6 = Model('Random Forest Classifier - Depth 5', RandomForestClassifier(max_
 model7 = Model('Random Forest Classifier - Depth 10', RandomForestClassifier(max_depth = 10))
 model8 = Model('Stochastic Gradient Descent', SGDClassifier(), algorithm = "SAMME")
 model9 = Model('SVC', SVC(), algorithm = "SAMME")
-models = [model1, model2, model3, model4, model5, model6, model7, model8, model9]
+#models = [model1, model2, model3, model4, model5, model6, model7, model8, model9]
+models = [model1, model2, model3, model5, model6, model7, model8, model9]
 
 # Print that datasets are being imported
 print('Datasets are being imported...')
@@ -231,8 +232,7 @@ data_dim10.append('1 Integer Input -- Representing: Thal')
 dataset10 = Dataset('Heart Disease', heart_X, heart_y, description, 'Binary Value: 0 for No Presence and 1 for Presence', num_samples, data_dim10)
 
 # Store the imported datasets into the dataset array
-#data_sets = [dataset1, dataset2, dataset3, dataset4, dataset5, dataset6, dataset7, dataset8 ,dataset9, dataset10]
-data_sets = [dataset1, dataset2, dataset4, dataset5, dataset6, dataset7, dataset8 ,dataset9, dataset10]
+data_sets = [dataset1, dataset2, dataset3, dataset4, dataset5, dataset6, dataset7, dataset8 ,dataset9, dataset10]
 
 # Run the model comparisons on the given datasets and print the results
 print('Beginning Model Comparisons...')
